@@ -546,6 +546,8 @@ def calculate(frameskipnumber, path_to_video, map_sector_path):
                 y4After = int((x4 * sin + y4 * cos) + image_center[1])
                 center_dronex=int((x1After+x3After)/2)
                 center_droney=int((y1After+y3After)/2)
+
+
                 # calculating degree between our mission coordinates and drone coordinates
                 degree, centerFront, centerBack =calculateDegreeToDestination((x1After,y1After), (x2After,y2After), (x3After, y3After), (x4After, y4After), 380, 733)
                 # taking to account only points in certain treshold
@@ -576,10 +578,13 @@ def calculate(frameskipnumber, path_to_video, map_sector_path):
                     pts = np.array([[x1After, y1After], [x2After, y2After], [x3After, y3After], [x4After, y4After]], np.int32)
                     pts = pts.reshape((-1, 1, 2))
                     cv2.polylines(img_rgb, [pts], True, (0, 255, 255), 3)
-                    cv2.rectangle(img_rgb, (633, 457), (643, 467), (0, 0, 255), 20)
+
+                    # cv2.arrowedLine(image, start_point, end_point, color, thickness, line_type, shift, tipLength)
+                    cv2.arrowedLine(img_rgb, (center_dronex, center_droney), centerFront, (27,65,101), 3, tipLength=0.5)
+
                     font = cv2.FONT_HERSHEY_SIMPLEX
                     org = (50, 100)
-                    fontScale = 1
+                    fontScale = 1.3
                     color = (0, 255, 0)
                     thickness = 3
                     text = "turn  %.2f degree" % degree
@@ -591,6 +596,7 @@ def calculate(frameskipnumber, path_to_video, map_sector_path):
                         noGPS = True
                     if noGPS:
                         print("NO GPS")
+                        cv2.rectangle(img_rgb, (633, 457), (643, 467), (0, 0, 255), 20)
                         if landed == False:
                             if turned == False:
                                 cv2.putText(img_rgb, text, org, font,
@@ -609,6 +615,17 @@ def calculate(frameskipnumber, path_to_video, map_sector_path):
                     else:
                         print("GPS MODE")
                         cv2.putText(img_rgb, "GPS MODE", (50, 50), font,
+                                    fontScale, (0, 255, 0), thickness, cv2.LINE_AA)
+                        longCurrent = (48.54 + (48.58 - 48.54) * center_dronex / 1500)
+                        latCurrent = (35.07 + (35.10 - 35.07) * center_droney / 700)
+
+                        "turn  %.2f degree" % degree
+
+                        cv2.putText(img_rgb, "GPS MODE", (50, 50), font,
+                                    fontScale, (0, 255, 0), thickness, cv2.LINE_AA)
+                        cv2.putText(img_rgb, "%.5f" % longCurrent, (50, 100), font,
+                                    fontScale, (0, 255, 0), thickness, cv2.LINE_AA)
+                        cv2.putText(img_rgb, "%.5f" % latCurrent, (50, 150), font,
                                     fontScale, (0, 255, 0), thickness, cv2.LINE_AA)
 
 
